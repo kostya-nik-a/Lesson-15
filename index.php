@@ -1,26 +1,6 @@
 <?php
 
-require_once 'function.php';
 require_once 'table.model.php';
-require_once 'users.model.php';
-
-//die(print_r($_SESSION));
-
-if (!empty($_POST['action'])) {
-    $params = array_merge([], $_POST);
-    switch ($_POST['action']) {
-        case 'create':
-            createTable();
-        break;
-        case 'update':
-            updateTask($params);
-        break;
-        case 'insert':
-            assignTask($params);
-        break;
-    }
-}
-
 
 ?>
 
@@ -38,8 +18,8 @@ if (!empty($_POST['action'])) {
                 <div class="col-lg-12">
                     <h1>Создание таблицы:</h1>
                     <form method="POST" action="" class="form-inline">
-                        <input type="text" name="description" placeholder="Имя таблицы" value="" class="form-control">
-                        <input type="hidden" name="id" value="">
+                        <input type="text" name="tableName" placeholder="Имя таблицы" value="" class="form-control">
+                        <input type="hidden" name="id" value="id">
                         <table class="table table-striped m-t-xl">
                             <thead>
                             <tr>
@@ -48,15 +28,17 @@ if (!empty($_POST['action'])) {
                                 <th>Длина поля</th>
                                 <th>Тип кодировки</th>
                                 <th>Auto-Inctiment</th>
+                                <th>Ключ</th>
                             </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><input type="text" name="description" placeholder="Имя поля" value="" class="form-control"></td>
+                                    <td><input type="text" name="description" placeholder="Имя поля" value=""
+                                               class="form-control"></td>
                                     <td>
-                                        <select name="sort_by" id="sort" class="form-control">
+                                        <select name="type_field" id="sort" class="form-control">
                                             <option selected disabled>Выберите тип поля</option>
-                                            <option value="integer">INT</option>
+                                            <option value="int">INT</option>
                                             <option value="varchar">VARCHAR</option>
                                             <option value="text">TEXT</option>
                                             <option value="tinyint">TINYINT</option>
@@ -64,22 +46,24 @@ if (!empty($_POST['action'])) {
                                             <option value="datestamp">TIMESTAMP</option>
                                         </select>
                                     </td>
-                                    <td><input type="text" name="description" placeholder="Длина поля" value="" class="form-control"></td>
+                                    <td><input type="text" name="lenght" placeholder="Длина поля" value=""
+                                               class="form-control"></td>
                                     <td>
-                                        <select name="sort_by" id="sort" class="form-control">
+                                        <select name="type_code" id="sort" class="form-control">
                                             <option selected disabled>Выберите тип кодировки</option>
                                             <option value="utf8">UTF-8</option>
                                             <option value="cp1251">cp1251</option>
                                         </select>
                                     </td>
-                                    <td><input name="field_extra[0]" id="field_0_8" type="checkbox" value="AUTO_INCREMENT"></td>
+                                    <td>
+                                        <input name="extra" type="checkbox" value="AUTO_INCREMENT">
+                                    </td>
+                                    <td>
+                                        <input name="key" type="checkbox" value="">
                                 </tr>
+                                </td>
                             </tbody>
                         </table>
-
-                        <div class="form-group">
-                            <button type="submit" name="action" value="insert" class="btn btn-success">Добавить поле</button>
-                        </div>
 
                         <div class="row" style="padding: 20px 0;">
                             <div class="col-lg-4">
@@ -93,6 +77,14 @@ if (!empty($_POST['action'])) {
                 </div>
             </div>
         </div>
-        <a href="db.list.php">Таблицы</a>
+<?php
+        if (!empty($_POST)) {
+            print_r($_POST);
+
+            createTable($_POST);
+        echo "<h1>Таблица <strong><i>".$_POST['tableName']."</i></strong> создана успешно</h1>." ;
+        }
+?>
+        <p>Перейти к просмотру <a href="db.list.php">Таблиц</a></p>
     </body>
 </html>

@@ -2,24 +2,44 @@
 
 require_once "db.connect.php";
 
-function createTable() {
-    $db = connectDB();
-    $sql = "CREATE TABLE `orders` (
-        `id` int(11) NOT NULL,
-        `order_id` int(11) NOT NULL,
-        `category` varchar(255) NOT NULL,
-        `description` text NOT NULL,
-        `price` tinyint(4) NOT NULL DEFAULT '0',
-        `date_added` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-    $query = $db->prepare($sql);
-    $query->bindParam(':user_id', $user_id, PDO::FETCH_ASSOC);
-    $query->execute();
-    return $query->fetchAll();
+function createTable($params) {
+    try {
+        $db = connectDB();
+
+        $sql = "CREATE TABLE `" . $params['tableName'] . "` (
+        `" . $params['id'] . "` " . $params['type_field'] . "(" . $params['lenght'] . ") NOT NULL " . $params['extra'] . ",
+        `" . $params['description'] . "` " . $params['type_field'] . "(" . $params['lenght'] . ") NOT NULL,
+        PRIMARY KEY (`" . $params['id'] . "`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=" . $params['type_code'] . ";";
+        $query = $db->prepare($sql);
+
+        $query->execute();
+        return $query->fetchAll();
+    }
+    catch(PDOException $e)
+    {
+        echo $sql . "<br>" . $e->getMessage();
+    }
 }
 
-function addRowTable() {
+function addRowTable($params) {
+    try {
+        $db = connectDB();
 
+        $sql = "INSERT INTO `" . $params['tableName'] . "` (
+        `" . $params['id'] . "` " . $params['type_field'] . "(" . $params['lenght'] . ") NOT NULL " . $params['extra'] . ",
+        `" . $params['description'] . "` " . $params['type_field'] . "(" . $params['lenght'] . ") NOT NULL,
+        PRIMARY KEY (`" . $params['id'] . "`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=" . $params['type_code'] . ";";
+        $query = $db->prepare($sql);
+
+        $query->execute();
+        return $query->fetchAll();
+    }
+    catch(PDOException $e)
+    {
+        echo $sql . "<br>" . $e->getMessage();
+    }
 }
 
 function showAllTables() {
@@ -37,17 +57,19 @@ function describeTable($tableName) {
     return $query->fetchAll(PDO :: FETCH_ASSOC);
 }
 
-function editTable($tableName, $params = []) {
+function editTable($action, $tableName, $params) {
     $db = connectDB();
-    $sql = "ALTER TABLE $tableName MODIFY $params";
-    $query = $db->prepare($sql);
-    $query->execute();
-    return $query->fetchAll(PDO :: FETCH_ASSOC);
-}
-
-function deleteTable($tableName, $params) {
-    $db = connectDB();
-    $sql = "ALTER TABLE $tableName DROP COLUMN $params";
-    $query = $db->prepare($sql);
-    $query->execute();
+    switch ($action) {
+        case 'change':
+            $sql = "ALTER TABLE $tableName MODIFY $params";
+            $query = $db->prepare($sql);
+            $query->execute();
+            return $query->fetchAll(PDO :: FETCH_ASSOC);
+            break;
+        case 'delete':
+            $sql = "ALTER TABLE $tableName DROP COLUMN $params";
+            $query = $db->prepare($sql);
+            $query->execute();
+            break;
+    }
 }
